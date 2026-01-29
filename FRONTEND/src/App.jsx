@@ -38,9 +38,9 @@ function App() {
   //   toast.error("Not authenticated");
   //   navigate("/auth/login");
   // }
-  if (authChecking) {
-    return <Loader className="h-10 w-8  animate-spin" />;
-  }
+  // if (authChecking) {
+  //   return <Loader className="h-10 w-8  animate-spin" />;
+  // }
 
   return (
     <>
