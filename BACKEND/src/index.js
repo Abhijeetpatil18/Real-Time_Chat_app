@@ -39,10 +39,12 @@ console.log(process.env.NODE_ENV);
 console.log("directory", __dirname);
 
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../FRONTEND/dist")));
+  const frontendPath = path.join(__dirname, "../FRONTEND/dist");
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../FRONTEND/dist/index.html"));
+  app.use(express.static(frontendPath));
+
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(frontendPath, "index.html"));
   });
 }
 
