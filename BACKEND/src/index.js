@@ -9,8 +9,6 @@ import authRouter from "../routes/auth.routes.js";
 import messageRouter from "../routes/message.routes.js";
 import connectDB from "../lib/db.js";
 
-const PORT = process.env.PORT;
-
 // const app = express();
 
 const allowedOrigins = ["http://localhost:3000"];
@@ -29,17 +27,22 @@ connectDB(); //DB connection
 const __dirname = path.resolve();
 
 dotenv.config(); // .env variables import
+
+const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api", messageRouter);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../../FRONTEND/dist")));
+console.log(process.env.NODE_ENV);
+console.log("directory", __dirname);
 
-  app.get((req, res) => {
-    res.sendFile(path.join(__dirname, "../../FRONTEND/dist/index.html"));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../FRONTEND/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../FRONTEND/dist/index.html"));
   });
 }
 
