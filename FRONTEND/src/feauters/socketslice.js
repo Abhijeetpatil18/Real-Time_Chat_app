@@ -11,7 +11,6 @@ const socketSlice = createSlice({
       state.socket = action.payload;
     },
     setOnlineUsers: (state, action) => {
-      // console.log("online users called");
       state.onlineUsers = action.payload;
     },
     clearSocket: (state) => {

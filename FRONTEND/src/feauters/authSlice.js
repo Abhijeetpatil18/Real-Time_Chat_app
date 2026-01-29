@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-const BASE_URL = "http://localhost:5000";
 import { io } from "socket.io-client";
 
 const initialState = {

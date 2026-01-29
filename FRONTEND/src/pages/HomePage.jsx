@@ -11,6 +11,9 @@ import {
 } from "../feauters/socketslice.js";
 import { io } from "socket.io-client";
 
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:5000" : "/";
+
 const HomePage = () => {
   const { selectedUser, authUser } = useSelector((state) => state.auth);
   const { socket } = useSelector((state) => state.socket);
@@ -26,14 +29,13 @@ const HomePage = () => {
       socket.off("newMessage");
     };
   }, [socket]);
-  // console.log(authUser);
   const dispatch = useDispatch();
   useEffect(() => {
     if (!authUser?.id) return;
 
-    const socket = io("http://localhost:5000", {
+    const socket = io(BASE_URL, {
       auth: { userId: authUser.id },
-      transports: ["websocket"], // force clean handshake
+      transports: ["websocket"],
     });
 
     dispatch(setSocket(socket));

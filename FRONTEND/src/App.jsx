@@ -23,7 +23,6 @@ function App() {
         });
         if (res.status === 200) {
           dispatch(checkAuth(res.data));
-          navigate("/profile");
         }
       } catch {
         toast.error("Not authenticated");
@@ -34,10 +33,6 @@ function App() {
 
     checkingAuth();
   }, [dispatch]);
-
-  useEffect(() => {
-    console.log("isAuthenticated updated:", isAuthenticated);
-  }, [isAuthenticated]);
 
   // if (!authChecking && !isAuthenticated) {
   //   toast.error("Not authenticated");
