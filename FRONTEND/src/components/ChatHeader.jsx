@@ -30,7 +30,7 @@ const ChatHeader = () => {
         <div className="flex items-center gap-3">
           <div className="relative">
             <img
-              src={selectedUser.profilePic || "/avatar.png"}
+              src={selectedUser.profilePic || "/profile.jpg"}
               alt={selectedUser.name}
               className="w-10 h-10 rounded-full object-cover border-2 border-base-300"
             />

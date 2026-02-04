@@ -8,24 +8,29 @@ import { Loader } from "lucide-react";
 import { useState } from "react";
 
 function App() {
-  const [authChecking, setAuthCkeking] = useState(true);
+  const [authChecking, setAuthCkeking] = useState();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
   useEffect(() => {
+    setAuthCkeking(true);
     const checkingAuth = async () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
       try {
         const res = await axios.get("http://localhost:5000/api/auth/check", {
-          headers: { Authorization: `Bearer ${token}` },
+          // headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         });
         if (res.status === 200) {
           dispatch(checkAuth(res.data));
+          navigate("/app");
         }
       } catch {
-        toast.error("Not authenticated");
+        toast.error("Login first");
+        setAuthCkeking(false);
+        navigate("/auth/login");
       } finally {
         setAuthCkeking(false);
       }
@@ -34,13 +39,9 @@ function App() {
     checkingAuth();
   }, [dispatch]);
 
-  // if (!authChecking && !isAuthenticated) {
-  //   toast.error("Not authenticated");
-  //   navigate("/auth/login");
-  // }
-  // if (authChecking) {
-  //   return <Loader className="h-10 w-8  animate-spin" />;
-  // }
+  if (authChecking == true) {
+    return <Loader className="h-10 w-8  animate-spin" />;
+  }
 
   return (
     <>
