@@ -11,7 +11,10 @@ import connectDB from "../lib/db.js";
 dotenv.config(); // .env variables import
 connectDB(); //DB connection
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  process.env.CLIENT_URL, // Add your frontend URL here
+]; // Add your allowed origins here
 
 const corsOptions = {
   origin: allowedOrigins, // Allow only these origins
