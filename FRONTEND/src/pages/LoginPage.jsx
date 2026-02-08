@@ -20,7 +20,6 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     setLogging(true);
     e.preventDefault();
-    console.log(formData);
     // login(formData);
 
     try {
@@ -37,7 +36,6 @@ const LoginPage = () => {
       if (!res) {
         return console.log("Failed to login");
       }
-      console.log(res.data);
       localStorage.setItem("token", res.data.token);
       const userDetails = {
         name: res.data.name,
