@@ -8,14 +8,18 @@ import { sendNewMessage } from "../feauters/messageSlice.js";
 const ChatInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
   const fileInputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
 
   const { selectedUser } = useSelector((state) => state.message);
   const { socket } = useSelector((state) => state.socket);
+  const { authUser } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
 
   const handleImageChange = (e) => {
+    console.log(e);
     const file = e.target.files[0];
     if (!file) return;
 
@@ -31,32 +35,67 @@ const ChatInput = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleTyping = (e) => {
+    setText(e.target.value);
+
+    if (!socket || !selectedUser || !authUser) return;
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit("typing", {
+        senderId: authUser.id,
+        receiverId: selectedUser._id,
+      });
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      socket.emit("stopTyping", {
+        senderId: authUser.id,
+        receiverId: selectedUser._id,
+      });
+    }, 1200);
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
+    console.log(imagePreview);
     if (!text.trim() && !imagePreview) return;
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    setIsTyping(false);
+    socket.emit("stopTyping", {
+      senderId: authUser.id,
+      receiverId: selectedUser._id,
+    });
 
     try {
       const res = await axiosInstance.post(`/messages/${selectedUser._id}`, {
-        text,
+        text, // string
+        image: imagePreview || null, // base64 dataURL string
       });
-      if (res) {
-        // dispatch(sendNewMessage(res.data));
 
-        console.log("Message sent suucessfully");
+      if (res) {
+        console.log("Message sent successfully");
         const data = {
           senderId: res.data.senderId,
           receiverId: res.data.receiverId,
           text: res.data.text,
+          image: res.data.image,
         };
         socket.emit("sendMessage", data);
       }
-
-      setImagePreview(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to send message:", error);
     } finally {
       setText("");
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -92,7 +131,7 @@ const ChatInput = () => {
                      placeholder:text-zinc-500 text-sm"
             placeholder="Type a message..."
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleTyping}
           />
           <button
             type="button"

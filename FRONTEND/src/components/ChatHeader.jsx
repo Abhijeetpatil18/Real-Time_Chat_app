@@ -5,7 +5,7 @@ import { cancelSelectedUser } from "../feauters/messageSlice";
 
 const ChatHeader = () => {
   const { selectedUser, sidebarUsers } = useSelector((state) => state.message);
-  const { onlineUsers } = useSelector((state) => state.socket);
+  const { onlineUsers, typingUsers } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
   const handleRemoveChat = () => {
     dispatch(cancelSelectedUser());
@@ -43,8 +43,13 @@ const ChatHeader = () => {
               {selectedUser.name}
             </h3>
             <p className="text-sm text-zinc-500">
-              {" "}
-              {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+              {typingUsers.includes(selectedUser._id) ? (
+                <span className="text-primary italic font-medium">Typing...</span>
+              ) : onlineUsers.includes(selectedUser._id) ? (
+                "Online"
+              ) : (
+                "Offline"
+              )}
             </p>
           </div>
         </div>

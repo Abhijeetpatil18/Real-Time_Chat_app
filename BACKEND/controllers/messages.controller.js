@@ -19,12 +19,8 @@ export const getUsersForSidebar = async (req, res) => {
 };
 
 export const getMessages = async (req, res) => {
-  // console.log(req.user._id);
-  // console.log(req.params.receiverId);
   const myId = req.user._id;
   const { receiverId } = req.params;
-  // console.log(myId);
-  // console.log(receiverId);
 
   try {
     const messages = await Message.find({
@@ -35,7 +31,6 @@ export const getMessages = async (req, res) => {
     }).sort({ createdAt: 1 });
 
     res.status(200).json(messages);
-    // console.log(messages);
   } catch (error) {
     console.log(error.message);
     res.staus(500).send("Server error");
@@ -45,21 +40,56 @@ export const getMessages = async (req, res) => {
 export const sendMessage = async (req, res) => {
   const senderId = req.user._id;
   const { receiverId } = req.params;
-  const { text } = req.body;
+  const { text = "", image } = req.body || {};
+
   try {
     if (!receiverId) {
       return res.status(400).json({ message: "receiverId missing in URL" });
     }
 
+    let imageUrl = null;
+
+    if (image) {
+      const uploadResult = await cloudinary.uploader.upload(image, {
+        resource_type: "auto",
+      });
+      imageUrl = uploadResult.secure_url;
+    }
+
     const message = await Message.create({
       senderId,
-      receiverId: receiverId,
-      text,
+      receiverId,
+      text, // now saving text as well
+      image: imageUrl,
     });
 
-    res.status(201).json(message);
+    return res.status(201).json(message);
   } catch (error) {
-    res.status(500).send("Server error");
     console.log(error.message);
+    return res.status(500).send("Server error");
+  }
+};
+
+export const deleteMessage = async (req, res) => {
+  const messageId = req.params.messageId;
+  // const userId = req.user._id;
+
+  try {
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    // if (message.senderId.toString() !== userId.toString()) {
+    //   return res.status(403).json({ message: "Unauthorized" });
+    // }
+
+    await Message.findByIdAndDelete(messageId);
+
+    return res.status(200).json({ message: "Message deleted successfully" });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).send("Server error");
   }
 };

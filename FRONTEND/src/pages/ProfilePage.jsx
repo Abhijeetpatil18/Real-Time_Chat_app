@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Camera, Mail, User } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { updateProfileImage } from "../feauters/authSlice";
 import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const { authUser, isAuthenticated } = useSelector((state) => state.auth);
   console.log("profile image", authUser);
   const dispatch = useDispatch();
@@ -32,8 +34,10 @@ const ProfilePage = () => {
       const res = await axiosInstance.post("/auth/profile", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      // console.log(res.data.updatedProfile);
+      console.log("hhhjnjk", res.data);
       dispatch(updateProfileImage(res.data.updatedProfile));
+      toast.success("Profile updated");
+      navigate(0);
     } catch (error) {
       console.error("Unable to update image", error);
     }

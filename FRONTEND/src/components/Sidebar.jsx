@@ -13,6 +13,7 @@ const Sidebar = () => {
   const { onlineUsers } = useSelector((state) => state.socket);
 
   const { authUser } = useSelector((state) => state.auth);
+  const [totalusers, setShowOnlineUsers] = useState(sidebarUsers);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -20,6 +21,7 @@ const Sidebar = () => {
         // console.log(res.data.users);
         if (res.data.message === "success") {
           dispatch(setSidebarUsers(res.data.users));
+          setShowOnlineUsers(res.data.users);
         }
       } catch (error) {
         console.log("Error in loading users", error);
@@ -31,6 +33,18 @@ const Sidebar = () => {
   }, []);
 
   if (usersLoading === true) return <SidebarSkeleton />;
+  function handleOnlineOnlyusers(event) {
+    if (event.target.checked) {
+      const users = onlineUsers;
+      const filteredUsers = sidebarUsers.filter((user) =>
+        onlineUsers.includes(user._id),
+      );
+
+      setShowOnlineUsers(filteredUsers);
+    } else {
+      setShowOnlineUsers(sidebarUsers);
+    }
+  }
 
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
@@ -45,7 +59,7 @@ const Sidebar = () => {
             <input
               type="checkbox"
               // checked={showOnlineOnly}
-              // onChange={(e) => setShowOnlineOnly(e.target.checked)}
+              onChange={(event) => handleOnlineOnlyusers(event)}
               className="checkbox checkbox-sm"
             />
             <span className="text-sm">Show online only</span>
@@ -57,9 +71,9 @@ const Sidebar = () => {
       </div>
 
       <div className="overflow-y-auto w-full py-3">
-        {sidebarUsers.map((user) => (
+        {totalusers.map((user) => (
           <button
-            key={user._id.toString()}
+            // key={user._id.toString()}
             onClick={() => {
               dispatch(setSelectedUser(user));
             }}
@@ -69,7 +83,7 @@ const Sidebar = () => {
               ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
           >
-            <div className="relative mx-auto lg:mx-0">
+            <div className="relative mx-auto lg:mx-0 ">
               <img
                 src={user.profilePic || "/profile.jpg"}
                 alt={user.name}
@@ -86,9 +100,9 @@ const Sidebar = () => {
             {/* User info - only visible on larger screens */}
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{user.name}</div>
-              {/* <div className="text-sm text-zinc-400">
+              <div className="text-sm text-zinc-400">
                 {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-              </div> */}
+              </div>
             </div>
           </button>
         ))}

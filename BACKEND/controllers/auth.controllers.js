@@ -48,13 +48,13 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).send("Invalid credentials");
     }
-    const isMatch = bcrypt.compare(String(password), user.password);
+    const isMatch = await bcrypt.compare(String(password), user.password);
     if (!isMatch) {
       return res.status(400).send("Invalid password");
     }
@@ -113,7 +113,6 @@ export const updateProfile = async (req, res) => {
       return res.status(400).send("Profile pic needed");
     }
 
-    // Upload to Cloudinary using stream
     const uploadPromise = new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { resource_type: "auto" },
@@ -127,12 +126,12 @@ export const updateProfile = async (req, res) => {
       );
       uploadStream.end(req.file.buffer);
     });
-
-    const updatedResponse = await uploadPromise;
+    console.log("Uploading to Cloudinary...");
+    const result = await uploadPromise;
 
     const updatedProfile = await User.findOneAndUpdate(
       { _id: userId },
-      { profilePic: updatedResponse.secure_url },
+      { profilePic: result.secure_url },
       { new: true },
     );
     res.status(200).json({ updatedProfile });
