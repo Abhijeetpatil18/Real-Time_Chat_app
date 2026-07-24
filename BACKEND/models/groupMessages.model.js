@@ -1,14 +1,13 @@
 import mongoose from "mongoose";
-import User from "./users.models.js";
 
-const messageSchema = new mongoose.Schema(
+const groupMessageSchema = new mongoose.Schema(
   {
-    senderId: {
+    groupId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Group",
       required: true,
     },
-    receiverId: {
+    senderId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -16,12 +15,12 @@ const messageSchema = new mongoose.Schema(
     text: {
       type: String,
     },
-    image: {
-      type: String,
-    },
     isGroup: {
       type: Boolean,
-      default: false,
+      default: true,
+    },
+    image: {
+      type: String,
     },
   },
   {
@@ -29,6 +28,6 @@ const messageSchema = new mongoose.Schema(
   },
 );
 
-const Message = mongoose.model("Message", messageSchema);
+const GroupMessage = mongoose.model("GroupMessage", groupMessageSchema);
 
-export default Message;
+export default GroupMessage;

@@ -74,7 +74,6 @@ export const login = async (req, res) => {
     res.status(500).send("Internal server error");
   }
 };
-
 export const logout = async (req, res) => {
   try {
     res.cookie("jwt", "", {

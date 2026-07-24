@@ -4,6 +4,7 @@ const initialState = {
   selectedUser: null,
   messages: [],
   sidebarUsers: [],
+  chatView: "chat",
 };
 
 const messageSlice = createSlice({
@@ -17,6 +18,7 @@ const messageSlice = createSlice({
     //selecting user
     setSelectedUser: (state, action) => {
       state.selectedUser = action.payload;
+      state.chatView = "chat";
     },
     setSidebarUsers: (state, action) => {
       state.sidebarUsers = action.payload;
@@ -25,6 +27,10 @@ const messageSlice = createSlice({
 
     cancelSelectedUser: (state) => {
       state.selectedUser = null;
+      state.chatView = "chat";
+    },
+    setChatView: (state, action) => {
+      state.chatView = action.payload;
     },
     sendNewMessage: (state, action) => {
       console.log("called message");
@@ -40,6 +46,7 @@ export const {
   setSelectedUser,
   setSidebarUsers,
   cancelSelectedUser,
+  setChatView,
   sendNewMessage,
 } = messageSlice.actions;
 export default messageSlice.reducer;

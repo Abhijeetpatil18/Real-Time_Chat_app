@@ -1,9 +1,9 @@
 import { useRef, useState } from "react";
-import { Image, Send, X, Smile } from "lucide-react";
+import { Image, Send, X } from "lucide-react";
 import { axiosInstance } from "../lib/axios.js";
 import { useDispatch, useSelector } from "react-redux";
 import { sendNewMessage } from "../feauters/messageSlice.js";
-// import toast from "react-hot-toast";
+import { createGroupMessageRequest } from "../lib/groupApi.js";
 
 const ChatInput = () => {
   const [text, setText] = useState("");
@@ -62,33 +62,54 @@ const ChatInput = () => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    console.log(imagePreview);
-    if (!text.trim() && !imagePreview) return;
+    if (!selectedUser || (!text.trim() && !imagePreview)) return;
 
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
     setIsTyping(false);
-    socket.emit("stopTyping", {
-      senderId: authUser.id,
-      receiverId: selectedUser._id,
-    });
+
+    if (socket) {
+      socket.emit("stopTyping", {
+        senderId: authUser.id,
+        receiverId: selectedUser._id,
+      });
+    }
+
+    const payload = {
+      text,
+      image: imagePreview || null,
+    };
 
     try {
-      const res = await axiosInstance.post(`/messages/${selectedUser._id}`, {
-        text, // string
-        image: imagePreview || null, // base64 dataURL string
-      });
+      let res;
 
-      if (res) {
-        console.log("Message sent successfully");
-        const data = {
-          senderId: res.data.senderId,
-          receiverId: res.data.receiverId,
+      if (selectedUser.isGroup) {
+        res = await createGroupMessageRequest(selectedUser._id, payload);
+      } else {
+        res = await axiosInstance.post(`/messages/${selectedUser._id}`, payload);
+      }
+
+      if (res?.data) {
+        const messageData = {
+          _id: res.data._id,
+          senderId: res.data.senderId || authUser.id,
+          senderName:
+            res.data.senderName || authUser.name || authUser.username || "You",
+          receiverId: res.data.receiverId || selectedUser._id,
           text: res.data.text,
           image: res.data.image,
         };
-        socket.emit("sendMessage", data);
+
+        dispatch(sendNewMessage(messageData));
+
+        if (socket) {
+          if (selectedUser.isGroup) {
+            socket.emit("newGroupMessage", messageData);
+          } else {
+            socket.emit("sendMessage", messageData);
+          }
+        }
       }
     } catch (error) {
       console.error("Failed to send message:", error);

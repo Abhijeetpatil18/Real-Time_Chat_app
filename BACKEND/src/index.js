@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import authRouter from "../routes/auth.routes.js";
 import messageRouter from "../routes/message.routes.js";
+import groupRouter from "../routes/group.routes.js";
 import connectDB from "../lib/db.js";
 
 dotenv.config(); // .env variables import
@@ -36,6 +37,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api", messageRouter);
+app.use("/api", groupRouter);
 
 server.listen(PORT, () => {
   console.log("server listening on PORT", PORT);

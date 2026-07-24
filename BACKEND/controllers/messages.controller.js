@@ -36,7 +36,49 @@ export const getMessages = async (req, res) => {
     res.staus(500).send("Server error");
   }
 };
+export const forwordMessage = async (req, res) => {
+  const { messageId } = req.params;
+  const recipientIds = req.body.recievers || [];
+  console.log(recipientIds);
 
+  try {
+    const originalMessage = await Message.findById(messageId);
+
+    if (!originalMessage) {
+      return res.status(404).json({ message: "Original message not found" });
+    }
+
+    if (!Array.isArray(recipientIds) || recipientIds.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "At least one recipient is required" });
+    }
+
+    const forwardedMessages = await Promise.all(
+      recipientIds.map(async (receiverId) => {
+        return Message.create({
+          senderId: req.user._id,
+          receiverId,
+          text: originalMessage.text,
+          image: originalMessage.image,
+        });
+      }),
+    );
+
+    return res.status(201).json({
+      message: "Message forwarded successfully",
+      success: true,
+      forwardedMessages,
+      originalMessageId: messageId,
+      recipientCount: forwardedMessages.length,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
 export const sendMessage = async (req, res) => {
   const senderId = req.user._id;
   const { receiverId } = req.params;

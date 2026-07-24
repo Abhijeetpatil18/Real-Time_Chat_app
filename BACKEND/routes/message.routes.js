@@ -5,6 +5,7 @@ import {
   getUsersForSidebar,
   sendMessage,
   deleteMessage,
+  forwordMessage,
 } from "../controllers/messages.controller.js";
 import { protectRoute } from "../lib/utils.js";
 
@@ -14,5 +15,6 @@ router.get("/users", protectRoute, getUsersForSidebar);
 router.get("/messages/:receiverId", protectRoute, getMessages);
 router.post("/messages/:receiverId", protectRoute, sendMessage);
 router.delete("/messages/:messageId", protectRoute, deleteMessage);
+router.post("/messages/:messageId/forward", protectRoute, forwordMessage);
 
 export default router;

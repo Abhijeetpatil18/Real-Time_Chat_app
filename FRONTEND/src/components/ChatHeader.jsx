@@ -1,18 +1,15 @@
 import React from "react";
 import { Phone, Video, Info, MoreVertical } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { cancelSelectedUser } from "../feauters/messageSlice";
+import { cancelSelectedUser, setChatView } from "../feauters/messageSlice";
 
 const ChatHeader = () => {
-  const { selectedUser, sidebarUsers } = useSelector((state) => state.message);
+  const { selectedUser } = useSelector((state) => state.message);
   const { onlineUsers, typingUsers } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
   const handleRemoveChat = () => {
     dispatch(cancelSelectedUser());
   };
-
-  // Find the selected user details from sidebarUsers
-  // const user = sidebarUsers.find((u) => u._id === selectedUser);
 
   if (!selectedUser.name) {
     return (
@@ -61,9 +58,15 @@ const ChatHeader = () => {
           <button className="btn btn-circle btn-ghost btn-sm hover:bg-base-200 transition-colors">
             <Video size={18} />
           </button>
-          <button className="btn btn-circle btn-ghost btn-sm hover:bg-base-200 transition-colors">
-            <Info size={18} />
-          </button>
+          {selectedUser?.isGroup && (
+            <button
+              type="button"
+              onClick={() => dispatch(setChatView("group-info"))}
+              className="btn btn-circle btn-ghost btn-sm hover:bg-base-200 transition-colors"
+            >
+              <Info size={18} />
+            </button>
+          )}
           <button className="btn btn-circle btn-ghost btn-sm hover:bg-base-200 transition-colors">
             <MoreVertical size={18} />
             <kbd className="kbd size-6" onClick={() => handleRemoveChat()}>
