@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { Socket } from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -10,12 +9,10 @@ import {
   setOnlineUsers,
 } from "../feauters/socketslice.js";
 import { io } from "socket.io-client";
-
-const BASE_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:5000" : "/";
+import { SOCKET_BASE_URL } from "../lib/env.js";
 
 const HomePage = () => {
-  const { selectedUser, authUser } = useSelector((state) => state.auth);
+  const { authUser } = useSelector((state) => state.auth);
   const { socket } = useSelector((state) => state.socket);
   useEffect(() => {
     if (!socket) return;
@@ -33,7 +30,7 @@ const HomePage = () => {
   useEffect(() => {
     if (!authUser?.id) return;
 
-    const socket = io(BASE_URL, {
+    const socket = io(SOCKET_BASE_URL, {
       auth: { userId: authUser.id },
       transports: ["websocket"],
     });
