@@ -1,12 +1,43 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Phone, Video, Info, MoreVertical } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { cancelSelectedUser, setChatView } from "../feauters/messageSlice";
+import { axiosInstance } from "../lib/axios";
 
 const ChatHeader = () => {
   const { selectedUser } = useSelector((state) => state.message);
   const { onlineUsers, typingUsers } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [groupLoading, setGroupLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchGroupMembers = async () => {
+      if (!selectedUser?.isGroup || !selectedUser?._id) {
+        setGroupMembers([]);
+        return;
+      }
+
+      setGroupLoading(true);
+
+      try {
+        const res = await axiosInstance.get(`/groups/${selectedUser._id}`);
+        setGroupMembers(res?.data?.members || []);
+      } catch (error) {
+        console.log("Error loading group members in header", error);
+        setGroupMembers([]);
+      } finally {
+        setGroupLoading(false);
+      }
+    };
+
+    fetchGroupMembers();
+  }, [selectedUser?._id, selectedUser?.isGroup]);
+
+  const onlineGroupMembers = useMemo(() => {
+    return groupMembers.filter((member) => onlineUsers.includes(member._id));
+  }, [groupMembers, onlineUsers]);
+
   const handleRemoveChat = () => {
     dispatch(cancelSelectedUser());
   };
@@ -39,15 +70,30 @@ const ChatHeader = () => {
             <h3 className="font-semibold text-base-content">
               {selectedUser.name}
             </h3>
-            <p className="text-sm text-zinc-500">
-              {typingUsers.includes(selectedUser._id) ? (
-                <span className="text-primary italic font-medium">Typing...</span>
-              ) : onlineUsers.includes(selectedUser._id) ? (
-                "Online"
-              ) : (
-                "Offline"
-              )}
-            </p>
+            {selectedUser?.isGroup ? (
+              <p className="text-sm text-zinc-500">
+                {groupLoading ? (
+                  "Loading members..."
+                ) : (
+                  <span>
+                    {groupMembers.length} members ·{" "}
+                    {onlineGroupMembers.length - 1} online
+                  </span>
+                )}
+              </p>
+            ) : (
+              <p className="text-sm text-zinc-500">
+                {typingUsers.includes(selectedUser._id) ? (
+                  <span className="text-primary italic font-medium">
+                    Typing...
+                  </span>
+                ) : onlineUsers.includes(selectedUser._id) ? (
+                  "Online"
+                ) : (
+                  "Offline"
+                )}
+              </p>
+            )}
           </div>
         </div>
 

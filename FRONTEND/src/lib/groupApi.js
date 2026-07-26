@@ -21,6 +21,14 @@ export const createGroupMessageRequest = async (
   return axiosInstance.post(url, payload);
 };
 
+export const addGroupMemberRequest = async (
+  groupId,
+  memberId,
+  url = `/groups/${groupId}/members`,
+) => {
+  return axiosInstance.post(url, { memberId });
+};
+
 export const updateGroupMessageRequest = async (
   groupId,
   messageId,
