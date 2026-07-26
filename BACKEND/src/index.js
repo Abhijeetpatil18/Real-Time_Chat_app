@@ -14,19 +14,15 @@ connectDB(() => {
   console.log("Connected to MongoDB");
 }); //DB connection
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  process.env.CLIENT_URL, // Add your frontend URL here
-]; // Add your allowed origins here
-
 const corsOptions = {
-  origin: allowedOrigins, // Allow only these origins
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
+  origin: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific HTTP methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
   credentials: true, // If app uses cookies/sessions
 };
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 const PORT = process.env.PORT || 5000;
 app.use(express.json({ limit: "10mb" }));
