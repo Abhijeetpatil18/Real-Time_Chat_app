@@ -15,7 +15,10 @@ connectDB(() => {
 }); //DB connection
 
 const corsOptions = {
-  origin: [process.env.CLIENT_URL, "http://localhost:3000"], // Allow requests from this origin
+  origin: [
+    "https://real-time-chat-app-taupe-nine.vercel.app",
+    "http://localhost:3000",
+  ], // Allow requests from this origin
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific HTTP methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
   credentials: true, // If app uses cookies/sessions
