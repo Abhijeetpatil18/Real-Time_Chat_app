@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
@@ -12,6 +12,10 @@ const router = createBrowserRouter([
     element: <App />,
 
     children: [
+      {
+        index: true,
+        element: <Navigate to="/auth/login" replace />,
+      },
       {
         path: "/app",
         element: <HomePage />,
