@@ -15,7 +15,7 @@ connectDB(() => {
 }); //DB connection
 
 const corsOptions = {
-  origin: true,
+  origin: [process.env.CLIENT_URL, "http://localhost:3000"], // Allow requests from this origin
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow specific HTTP methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allow specific headers
   credentials: true, // If app uses cookies/sessions

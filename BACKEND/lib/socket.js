@@ -5,13 +5,14 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const FRONTEND_URL = process.env.CLIENT_URL;
+const CLIENT_URL = process.env.CLIENT_URL;
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [`http://localhost:3000`, FRONTEND_URL],
+    origin: [CLIENT_URL, "http://localhost:3000"],
+    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   },
 });
 const userSocketMap = {};
