@@ -22,7 +22,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 
 const PORT = process.env.PORT || 5000;
 app.use(express.json({ limit: "10mb" }));
